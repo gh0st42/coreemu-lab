@@ -99,13 +99,17 @@ fi
 
 
 if [ -n "$START_EXEC" ]; then
-    print_log INFO Executing "$START_EXEC" on all nodes
-    cea "$START_EXEC"
+    for CMD in "${START_EXEC[@]}"; do
+        print_log INFO Executing "$CMD" on all nodes
+        cea "$CMD"
+    done
 fi
 
 if [ -n "$START_DAEMONIZED" ]; then
-    print_log INFO Daemonizing "$START_DAEMONIZED" on all nodes
-    cea "$START_DAEMONIZED"
+for CMD in "${START_DAEMONIZED[@]}"; do
+        print_log INFO Daemonizing "$CMD" on all nodes
+        cda "$CMD"
+    done    
 fi
 
 if [ -n "$WARMUP" ]; then
