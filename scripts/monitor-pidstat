@@ -1,0 +1,9 @@
+#!/bin/sh
+
+FILTER=""
+if [ "$#" -eq 1 ]
+then
+  FILTER="-C $1"
+fi
+
+pidstat -durhH $FILTER -p ALL 1 > pidstat-$(hostname).log

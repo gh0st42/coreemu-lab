@@ -1,0 +1,8 @@
+#!/bin/sh
+
+FILTER=""
+if [ "$#" -eq 1 ]
+then
+  FILTER="-I $1"
+fi
+bwm-ng -o csv -t 1000 -u bytes -F net-$(hostname).log $FILTER

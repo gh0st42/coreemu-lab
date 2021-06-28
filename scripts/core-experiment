@@ -1,0 +1,174 @@
+#!/bin/bash
+
+fn_exists() { declare -F "$1" > /dev/null; }
+
+print_log() {
+    LOG_LEVEL=$1
+    shift
+    TS=$(date)
+    echo "$TS | $LOG_LEVEL | $@" 
+    #| tee /shared/simulation.log
+}
+
+panic() {
+    LOG_LEVEL=ERROR
+    shift
+    TS=$(date)
+    echo "$TS | $LOG_LEVEL | $@" 
+    #| tee /shared/simulation.log
+    exit -1
+}
+
+if [ "$#" -ne 1 ]
+then
+  echo "Usage: $0 <experiment config>"
+  exit 1
+fi
+
+BASEDIR=$(dirname $1)
+
+NAME=experiment
+MONITOR_PIDSTAT=0
+MONITOR_NET=0
+
+NOW=$(date +%s)
+
+CONFIG=$1
+. $CONFIG
+
+RESULTS_DIR=$BASEDIR/results-$NAME-$NOW
+
+print_log INFO Result will be put into $RESULTS_DIR
+mkdir $RESULTS_DIR || panic Could not create results directory: $RESULTS_DIR
+
+if [ ! -f "$BASEDIR/$SCENARIO" ]; then
+    panic Scenario $FILE not found.	
+fi
+
+##########################################################################
+#
+# General startup
+#
+##########################################################################
+
+print_log INFO Starting $BASEDIR/$SCENARIO
+core-cli xml -f $BASEDIR/$SCENARIO -s
+
+if [ $GUI = 1 ]; then
+    print_log INFO Attaching gui to session
+    core-pygui -s 1 &
+fi
+
+if fn_exists pre ; then
+    print_log INFO Found pre hook, executing it now...
+    pre
+fi
+
+##########################################################################
+#
+# Monitoring
+#
+##########################################################################
+
+
+print_log INFO Starting monitoring services
+
+if [ $MONITOR_PIDSTAT = 1 ]; then
+    PARAMS=""
+    if [ -n "$MONITOR_PIDSTAT_PARAMS" ]; then
+        PARAMS=$MONITOR_PIDSTAT_PARAMS
+    fi
+    print_log INFO Starting pidstat monitor.. $PARAMS
+    cda monitor-pidstat $PARAMS
+fi
+
+if [ $MONITOR_NET = 1 ]; then
+    PARAMS=""
+    if [ -n "$MONITOR_NET_PARAMS" ]; then
+        PARAMS=$MONITOR_NET_PARAMS
+    fi
+    print_log INFO Starting net monitor.. $PARAMS
+    cda monitor-net $PARAMS
+fi
+
+##########################################################################
+#
+# START simulation
+#
+##########################################################################
+
+
+if [ -n "$START_EXEC" ]; then
+    print_log INFO Executing "$START_EXEC" on all nodes
+    cea "$START_EXEC"
+fi
+
+if [ -n "$START_DAEMONIZED" ]; then
+    print_log INFO Daemonizing "$START_DAEMONIZED" on all nodes
+    cea "$START_DAEMONIZED"
+fi
+
+if [ -n "$WARMUP" ]; then
+    print_log INFO Warming up for $WARMUP seconds
+    sleep $WARMUP
+fi
+
+print_log INFO Experiment started: $(date +%s)
+
+##########################################################################
+#
+# STOP simulation
+#
+##########################################################################
+
+if [ -n "$RUNTIME" ]; then
+    sleep $RUNTIME
+
+    print_log INFO Experiment finished: $(date +%s)
+
+    if [ -n "$SHUTDOWN_PROCS" ]; then
+        print_log INFO Stopping user services: $SHUTDOWN_PROCS
+        killall $SHUTDOWN_PROCS 2>&1 > /dev/null
+    fi
+
+    print_log INFO Stopping monitoring services 
+    killall bwm-ng pidstat 2>&1 > /dev/null
+
+    print_log INFO Collecting *.log from all nodes 
+
+    if fn_exists post ; then
+        print_log INFO Found post hook, executing it now...
+        post $RESULTS_DIR
+    fi
+
+    print_log INFO Collecting data 
+    for i in $(fdfind .log /tmp/pycore.1/*.conf )
+    do         
+        NODE_NAME=$(echo $i | cut -d "/" -f 4- | cut -d "." -f 1)
+
+        print_log INFO Copying $i to $RESULTS_DIR/$NODE_NAME
+        if [ ! -d "$RESULTS_DIR/$NODE_NAME" ]; then
+            mkdir $RESULTS_DIR/$NODE_NAME
+        fi
+        cp $i $RESULTS_DIR/$NODE_NAME
+    done
+
+    if fn_exists analyze ; then
+        print_log INFO Found analyze hook, executing it now...
+        analyze $RESULTS_DIR
+    fi
+fi
+
+##########################################################################
+#
+# AFTER
+#
+##########################################################################
+
+if [ $GUI = 1 ] || [ $KEEP_RUNNING = 1 ]; then
+    print_log INFO Keeping session running
+    tail -f /dev/null
+else 
+    print_log INFO Deleting session
+    core-cli session -i 1 delete
+fi
