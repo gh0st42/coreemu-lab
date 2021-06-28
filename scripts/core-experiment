@@ -66,6 +66,32 @@ fi
 
 ##########################################################################
 #
+# START simulation
+#
+##########################################################################
+
+
+if [ -n "$START_EXEC" ]; then
+    for CMD in "${START_EXEC[@]}"; do
+        print_log INFO Executing "$CMD" on all nodes
+        cea "$CMD"
+    done
+fi
+
+if [ -n "$START_DAEMONIZED" ]; then
+for CMD in "${START_DAEMONIZED[@]}"; do
+        print_log INFO Daemonizing "$CMD" on all nodes
+        cda "$CMD"
+    done    
+fi
+
+if [ -n "$WARMUP" ]; then
+    print_log INFO Warming up for $WARMUP seconds
+    sleep $WARMUP
+fi
+
+##########################################################################
+#
 # Monitoring
 #
 ##########################################################################
@@ -93,29 +119,9 @@ fi
 
 ##########################################################################
 #
-# START simulation
+# ALL SYSTEMS RUNNING
 #
 ##########################################################################
-
-
-if [ -n "$START_EXEC" ]; then
-    for CMD in "${START_EXEC[@]}"; do
-        print_log INFO Executing "$CMD" on all nodes
-        cea "$CMD"
-    done
-fi
-
-if [ -n "$START_DAEMONIZED" ]; then
-for CMD in "${START_DAEMONIZED[@]}"; do
-        print_log INFO Daemonizing "$CMD" on all nodes
-        cda "$CMD"
-    done    
-fi
-
-if [ -n "$WARMUP" ]; then
-    print_log INFO Warming up for $WARMUP seconds
-    sleep $WARMUP
-fi
 
 print_log INFO Experiment started: $(date +%s)
 
