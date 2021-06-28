@@ -132,42 +132,52 @@ print_log INFO Experiment started: $(date +%s)
 ##########################################################################
 
 if [ -n "$RUNTIME" ]; then
+    print_log INFO Experiment will run for $RUNTIME seconds
     sleep $RUNTIME
-
-    print_log INFO Experiment finished: $(date +%s)
-
-    if [ -n "$SHUTDOWN_PROCS" ]; then
-        print_log INFO Stopping user services: $SHUTDOWN_PROCS
-        killall $SHUTDOWN_PROCS 2>&1 > /dev/null
-    fi
-
-    print_log INFO Stopping monitoring services 
-    killall bwm-ng pidstat 2>&1 > /dev/null
-
-    print_log INFO Collecting *.log from all nodes 
-
-    if fn_exists post ; then
-        print_log INFO Found post hook, executing it now...
-        post $RESULTS_DIR
-    fi
-
-    print_log INFO Collecting data 
-    for i in $(fdfind .log /tmp/pycore.1/*.conf )
-    do         
-        NODE_NAME=$(echo $i | cut -d "/" -f 4- | cut -d "." -f 1)
-
-        print_log INFO Copying $i to $RESULTS_DIR/$NODE_NAME
-        if [ ! -d "$RESULTS_DIR/$NODE_NAME" ]; then
-            mkdir $RESULTS_DIR/$NODE_NAME
-        fi
-        cp $i $RESULTS_DIR/$NODE_NAME
-    done
-
-    if fn_exists analyze ; then
-        print_log INFO Found analyze hook, executing it now...
-        analyze $RESULTS_DIR
-    fi
+else
+    print_log INFO Experiment will run until stopped through /shared/shutdown.txt
+    while [ ! -f /shared/shutdown.txt ]
+    do
+        sleep 1
+    done 
+    print_log INFO Got shutdown signal!
+    rm /shared/shutdown.txt
 fi
+
+print_log INFO Experiment finished: $(date +%s)
+
+if [ -n "$SHUTDOWN_PROCS" ]; then
+    print_log INFO Stopping user services: $SHUTDOWN_PROCS
+    killall $SHUTDOWN_PROCS 2>&1 > /dev/null
+fi
+
+print_log INFO Stopping monitoring services 
+killall bwm-ng pidstat 2>&1 > /dev/null
+
+print_log INFO Collecting *.log from all nodes 
+
+if fn_exists post ; then
+    print_log INFO Found post hook, executing it now...
+    post $RESULTS_DIR
+fi
+
+print_log INFO Collecting data 
+for i in $(fdfind .log /tmp/pycore.1/*.conf )
+do         
+    NODE_NAME=$(echo $i | cut -d "/" -f 4- | cut -d "." -f 1)
+
+    print_log INFO Copying $i to $RESULTS_DIR/$NODE_NAME
+    if [ ! -d "$RESULTS_DIR/$NODE_NAME" ]; then
+        mkdir $RESULTS_DIR/$NODE_NAME
+    fi
+    cp $i $RESULTS_DIR/$NODE_NAME
+done
+
+if fn_exists analyze ; then
+    print_log INFO Found analyze hook, executing it now...
+    analyze $RESULTS_DIR
+fi
+
 
 ##########################################################################
 #
@@ -175,10 +185,6 @@ fi
 #
 ##########################################################################
 
-if [ $GUI = 1 ] || [ $KEEP_RUNNING = 1 ]; then
-    print_log INFO Keeping session running
-    tail -f /dev/null
-else 
-    print_log INFO Deleting session
-    core-cli session -i 1 delete
-fi
+
+print_log INFO Deleting session
+core-cli session -i 1 delete
