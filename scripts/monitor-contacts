@@ -1,0 +1,13 @@
+#!/bin/sh
+
+DELAY=1
+if [ "$#" -eq 1 ]
+then
+  DELAY=$1
+fi
+
+while [ ! -f /shared/shutdown.txt ]
+do
+echo -n "$(date +%s)," && core-cli -js query session -i 1 | jq '.session.links[] | select(.color == "green")' | rg "node\d+_id" | sed -e 's/.*"node1_id": \([0-9]\),/\1-/g' | sed -e 's/.*"node2_id": \([0-9]\),/\1,/g' | tr -d '\n' && echo
+sleep $DELAY
+done

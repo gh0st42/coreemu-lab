@@ -117,6 +117,15 @@ if [ $MONITOR_NET = 1 ]; then
     cda monitor-net $PARAMS
 fi
 
+if [ $MONITOR_CONTACTS = 1 ]; then
+    PARAMS=""
+    if [ -n "$MONITOR_CONTACTS_PARAMS" ]; then
+        PARAMS=$MONITOR_CONTACTS_PARAMS
+    fi
+    print_log INFO Starting contacts monitor.. $PARAMS
+    monitor-contacts $PARAMS > $RESULTS_DIR/contacts.log &
+fi
+
 ##########################################################################
 #
 # ALL SYSTEMS RUNNING
