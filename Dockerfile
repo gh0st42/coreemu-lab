@@ -14,6 +14,7 @@ RUN apt-get update \
     fd-find \
     python3-pandas \
     python3-matplotlib \
+    jq \
     && apt-get clean
 
 WORKDIR /root
