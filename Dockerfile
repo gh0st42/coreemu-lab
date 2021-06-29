@@ -12,6 +12,8 @@ RUN apt-get update \
     bwm-ng \
     ripgrep \
     fd-find \
+    python3-pandas \
+    python3-matplotlib \
     && apt-get clean
 
 WORKDIR /root
@@ -21,6 +23,7 @@ RUN git clone https://github.com/gh0st42/core-automator &&\
 
 WORKDIR /usr/local/bin
 COPY scripts/* /usr/local/bin
+COPY analyzers/* /usr/local/bin
 
 EXPOSE 22
 EXPOSE 50051
