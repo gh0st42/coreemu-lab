@@ -23,8 +23,8 @@ RUN git clone https://github.com/gh0st42/core-automator &&\
     cp core-automator/*.py /usr/local/bin
 
 WORKDIR /usr/local/bin
-COPY scripts/* /usr/local/bin
-COPY analyzers/* /usr/local/bin
+COPY scripts/* /usr/local/bin/
+COPY analyzers/* /usr/local/bin/
 
 EXPOSE 22
 EXPOSE 50051
