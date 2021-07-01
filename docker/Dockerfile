@@ -15,12 +15,17 @@ RUN apt-get update \
     python3-pandas \
     python3-matplotlib \
     jq \
+    gnuplot \
     && apt-get clean
 
 WORKDIR /root
 RUN git clone https://github.com/gh0st42/core-automator &&\
     pip install appjar &&\
-    cp core-automator/*.py /usr/local/bin
+    cp core-automator/*.py /usr/local/bin &&\
+    rm -rf core-automator
+
+# needed for periodic-file-generator
+RUN pip install lorem-text
 
 WORKDIR /usr/local/bin
 COPY scripts/* /usr/local/bin/

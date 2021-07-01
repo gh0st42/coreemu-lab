@@ -1,0 +1,63 @@
+#!/usr/bin/env python3
+
+from lorem_text import lorem
+import random
+import sys
+import time
+import tempfile
+import os
+import os.path
+
+
+def usage():
+    print("usage: %s <txt|bin> <min_size> <max_size> <min_delay> <max_delay> <output_dir>" %
+          sys.argv[0])
+    print(" for text:     sizes mean number of words with lorem ipsum")
+    print(" for binary:   sizes mean number of kilobytes")
+    print(" for delay:    time in seconds to wait before next file is generated")
+    exit(1)
+
+
+def rnd_txt(output_dir, size):
+    content = lorem.words(size)
+    # print(content)
+    file = tempfile.NamedTemporaryFile(
+        suffix='.txt', dir=output_dir, delete=False)
+    file.write(content.encode('utf-8'))
+    fname = file.name
+    file.close()
+    print("%d %s" % (time.time(), fname))
+
+
+def rnd_bin(output_dir, size):
+    file = tempfile.NamedTemporaryFile(
+        suffix='.bin', dir=output_dir, delete=False)
+    fname = file.name
+    file.write(os.urandom(size*1024))
+    file.close()
+    print("%d %s" % (time.time(), fname))
+
+
+if len(sys.argv) < 7:
+    usage()
+
+text = True
+if sys.argv[1] == "bin":
+    text = False
+elif sys.argv[1] != "txt":
+    usage()
+
+size = [int(sys.argv[2]), int(sys.argv[3])]
+delay = [int(sys.argv[4]), int(sys.argv[5])]
+
+output_dir = sys.argv[6]
+
+while not os.path.isfile('/shared/shutdown.txt'):
+    next_size = random.randint(size[0], size[1])
+    if text:
+        rnd_txt(output_dir, next_size)
+    else:
+        rnd_bin(output_dir, next_size)
+
+    next_delay = random.randint(delay[0], delay[1])
+    time.sleep(next_delay)

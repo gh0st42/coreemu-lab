@@ -73,14 +73,14 @@ fi
 
 if [ -n "$START_EXEC" ]; then
     for CMD in "${START_EXEC[@]}"; do
-        print_log INFO Executing "$CMD" on all nodes
+        print_log INFO Executing \"$CMD\" on all nodes
         cea "$CMD"
     done
 fi
 
 if [ -n "$START_DAEMONIZED" ]; then
-for CMD in "${START_DAEMONIZED[@]}"; do
-        print_log INFO Daemonizing "$CMD" on all nodes
+    for CMD in "${START_DAEMONIZED[@]}"; do
+        print_log INFO Daemonizing \"$CMD\" on all nodes
         cda "$CMD"
     done    
 fi
@@ -188,6 +188,13 @@ do
     cp $i $RESULTS_DIR/$NODE_NAME
 done
 
+for i in /tmp/pycore.1/*.conf
+do
+  NODE_NAME=$(echo $i | cut -d "/" -f 4- | cut -d "." -f 1)
+  print_log INFO Gathering file stats for node $NODE_NAME  
+  find $i/ | cut -d "/" -f 4- > $RESULTS_DIR/$NODE_NAME/filelist.txt
+done
+
 if fn_exists analyze ; then
     print_log INFO Found analyze hook, executing it now...
     analyze $RESULTS_DIR
@@ -203,6 +210,11 @@ if [ $MONITOR_PIDSTAT = 1 ]; then
     fi
 fi
 
+for i in $RESULTS_DIR/*/filelist.txt
+do
+  NODE_NAME=$(echo $i | cut -d "/" -f 4)    
+  echo $NODE_NAME $(cat $i | wc -l) >> $RESULTS_DIR/filecount.csv  
+done
 
 ##########################################################################
 #

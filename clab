@@ -4,7 +4,11 @@ SHARED="/tmp/shared"
 PLATFORM=$(uname)
 
 if [ -n "$1" ]; then
-    SHARED=$(readlink -f $1)
+    if [ "$PLATFORM" = "Darwin" ]; then
+        SHARED=$(greadlink -f $1)
+    else
+        SHARED=$(readlink -f $1)
+    fi
     echo Using custom shared directory: $SHARED
 else 
     echo Using default shared directory: $SHARED
