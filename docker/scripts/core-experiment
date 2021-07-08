@@ -126,13 +126,24 @@ if [ $MONITOR_CONTACTS = 1 ]; then
     monitor-contacts $PARAMS > $RESULTS_DIR/contacts.log &
 fi
 
+if [ $MONITOR_XY = 1 ]; then
+    PARAMS=""
+    if [ -n "$MONITOR_XY_PARAMS" ]; then
+        PARAMS=$MONITOR_XY_PARAMS
+    fi
+    print_log INFO Starting xy position monitor.. $PARAMS
+    monitor-xy $PARAMS > $RESULTS_DIR/xy.log &
+fi
+
 ##########################################################################
 #
 # ALL SYSTEMS RUNNING
 #
 ##########################################################################
 
-print_log INFO Experiment started: $(date +%s)
+START_TIME=$(date +%s)
+print_log INFO Experiment started: $START_TIME
+echo $START_TIME > $RESULTS_DIR/start.txt
 
 ##########################################################################
 #
@@ -153,7 +164,9 @@ else
     rm /shared/shutdown.txt
 fi
 
-print_log INFO Experiment finished: $(date +%s)
+STOP_TIME=$(date +%s)
+print_log INFO Experiment finished: $STOP_TIME
+echo $STOP_TIME > $RESULTS_DIR/stop.txt
 
 if [ -n "$SHUTDOWN_PROCS" ]; then
     print_log INFO Stopping user services: $SHUTDOWN_PROCS
@@ -161,7 +174,7 @@ if [ -n "$SHUTDOWN_PROCS" ]; then
 fi
 
 print_log INFO Stopping monitoring services 
-killall bwm-ng pidstat monitor-contacts 2>&1 > /dev/null
+killall bwm-ng pidstat monitor-contacts monitor-xy 2>&1 > /dev/null
 
 print_log INFO Collecting *.log from all nodes 
 
@@ -206,15 +219,42 @@ if [ $MONITOR_PIDSTAT = 1 ]; then
         print_log INFO Plotting pidstat logs
         plot-pidstat.py $RESULTS_DIR RSS $MONITOR_PIDSTAT_PARAMS "Size in MB" "Nodes"
         plot-pidstat.py $RESULTS_DIR VSZ $MONITOR_PIDSTAT_PARAMS "Size in MB" "Nodes"
-        plot-pidstat.py $RESULTS_DIR CPU $MONITOR_PIDSTAT_PARAMS "CPU usage" "Nodes"
+        plot-pidstat.py $RESULTS_DIR '%CPU' $MONITOR_PIDSTAT_PARAMS "CPU usage" "Nodes"
     fi
 fi
 
+if [ $MONITOR_NET = 1 ]; then
+    print_log INFO Plotting net logs
+    NET_IFACE='total'
+    if [ -n "$MONITOR_NET_PARAMS" ]; then
+        NET_IFACE="$MONITOR_NET_PARAMS"
+    fi
+    plot-net-graph.py $RESULTS_DIR 'bytes_total/s' $NET_IFACE
+    plot-net-graph.py $RESULTS_DIR 'bytes_out/s' $NET_IFACE
+    plot-net-graph.py $RESULTS_DIR 'bytes_in/s' $NET_IFACE
+fi
+
+if [ $MONITOR_XY = 1 ]; then
+    print_log INFO Plotting xy position log    
+    plot-xy.py $RESULTS_DIR
+fi
+
+print_log INFO Analyzing file stats
 for i in $RESULTS_DIR/*/filelist.txt
 do
   NODE_NAME=$(echo $i | cut -d "/" -f 4)    
   echo $NODE_NAME $(cat $i | wc -l) >> $RESULTS_DIR/filecount.csv  
 done
+
+for i in $RESULTS_DIR/*/nohup.periodic-file-generator.*.log
+do
+  NODE_NAME=$(echo $i | cut -d "/" -f 4)    
+  echo $NODE_NAME $(cat $i | wc -l) >> $RESULTS_DIR/periodic-files-generated.csv  
+done
+
+print_log INFO Plotting contact data
+plot-contacts.py $RESULTS_DIR time
+plot-contacts.py $RESULTS_DIR node
 
 ##########################################################################
 #
@@ -225,3 +265,5 @@ done
 
 print_log INFO Deleting session
 core-cli session -i 1 delete
+
+cp $BASEDIR/experiment.log $RESULTS_DIR

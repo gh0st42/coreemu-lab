@@ -26,7 +26,7 @@ def rnd_txt(output_dir, size):
     file.write(content.encode('utf-8'))
     fname = file.name
     file.close()
-    print("%d %s" % (time.time(), fname))
+    print("%d %s" % (time.time(), fname), flush=True)
 
 
 def rnd_bin(output_dir, size):
@@ -35,7 +35,7 @@ def rnd_bin(output_dir, size):
     fname = file.name
     file.write(os.urandom(size*1024))
     file.close()
-    print("%d %s" % (time.time(), fname))
+    print("%d %s" % (time.time(), fname), flush=True)
 
 
 if len(sys.argv) < 7:

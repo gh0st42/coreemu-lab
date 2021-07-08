@@ -17,7 +17,7 @@ FILE=/shared/experiment.conf
 if [ -f "$FILE" ]; then
     echo "$FILE exists."
 	sleep 1
-	core-experiment $FILE 2>&1 | tee /shared/experiment.log
+	time core-experiment $FILE 2>&1 | tee /shared/experiment.log
 else 
 	core-gui
 fi

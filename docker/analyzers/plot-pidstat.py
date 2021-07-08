@@ -37,6 +37,7 @@ dfs = []
 
 p = re.compile('.*/pidstat-(.+).csv.log')
 
+per_node = {}
 for f in logfiles:
     m = p.match(f)
     node_name = m.group(1)
@@ -44,14 +45,33 @@ for f in logfiles:
     stats = df.describe().T
     the_row = stats[(stats.index == prop)]
     the_row.rename(index={prop: node_name}, inplace=True)
+
+    per_node[node_name] = [the_row["mean"][0],
+                           the_row["min"][0], the_row["max"][0]]
+
     dfs.append(the_row)
 
 df = pd.concat(dfs)
+df = df.sort_index()
 
-ax = df.plot.bar(y="mean", legend=False, yerr="std", title=prop)
+flat_per_node = []
+for k in sorted(per_node):
+    flat_per_node.append([k, per_node[k][0], per_node[k][1], per_node[k][2]])
+
+df2 = pd.DataFrame(flat_per_node, columns=["node", "mean", "min", "max"])
+df2 = (df2.assign(yerr_min=df2["mean"]-df2["min"])
+       .assign(yerr_max=df2["max"]-df2["mean"]))
+yerr = df2[['yerr_min', 'yerr_max']].T.values
+
+# yerr = pd.DataFrame([
+# df.mean()-df.min(), df.max()-df.mean()]).T.to_numpy()
+# print(per_node)
+#ax = df.plot.bar(y="mean", legend=False, yerr=yerr, title=prop)
+ax = df2.plot.bar(y="mean", x="node", yerr=yerr, legend=False, title=prop)
 plt.axhline(df["mean"].mean(), color='r', linestyle='--')
 plt.xlabel(xlabel)
 plt.ylabel(ylabel)
+plt.tight_layout()
 # plt.show()
 
 output_dir = base_dir + "/figures"

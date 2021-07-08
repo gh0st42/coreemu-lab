@@ -37,6 +37,8 @@ EXPOSE 50051
 # ADD extra /extra
 VOLUME /shared
 
+WORKDIR /shared
+
 COPY entryPoint.sh /root/entryPoint.sh
 ENTRYPOINT "/root/entryPoint.sh"
 
