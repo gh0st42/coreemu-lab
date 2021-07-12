@@ -18,6 +18,9 @@ The main features provided by *clab*:
 - report and plot generation
 - full experiment configurations for headless runs
 - extensible environment
+    - it's all automated through shell scripts
+    - python with pandas/matplotlib is available
+    - many useful CLI helpers are available (`sysstat`, `rg`, `jq`, `bwm-ng`, `gnuplot`, `tcpdump`, ...)
 - interactive mode with *coreemu* GUI
 - providing ssh service and *coreemu* gRPC
 
@@ -54,18 +57,22 @@ The main features provided by *clab*:
 
 ## Installation
 
-Requirements:
+### Requirements
 
 - [Docker](https://www.docker.com/)
 - Optionally: X11
 
-Installing *clab*:
+### Installing *clab*
 - Download *clab* starter: `curl https://raw.githubusercontent.com/gh0st42/coreemu-lab/main/clab > clab`
 - Make it executable: `chmod a+x ./clab`
 - Copy it to your PATH
 - Ready to use it
 
 **BEWARE:** *First time starting might take a while as the (big) docker images have to be downloaded!*
+
+### Updating
+
+Just refresh the docker image on your system: `docker pull gh0st42/coreemu-lab`
 
 ## Running *clab*
 

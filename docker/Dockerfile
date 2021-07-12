@@ -15,6 +15,7 @@ RUN apt-get update \
     python3-pandas \
     python3-matplotlib \
     jq \
+    tcpdump \
     gnuplot \
     && apt-get clean
 
