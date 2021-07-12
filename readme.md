@@ -24,6 +24,9 @@ The main features provided by *clab*:
 - interactive mode with *coreemu* GUI
 - providing ssh service and *coreemu* gRPC
 
+We are currently lacking documentation, except for this way too short readme, the example in `data/` and the source code itself. 
+There is a scientific publication in progress that will showcase *clab* and we are working on some easy to follow tutorials.
+
 ## General Overview
 
        ╔═════════════════════════════════════╗ ╔══════════════════════╗
