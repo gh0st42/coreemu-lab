@@ -6,7 +6,7 @@ It should work headless on any platform that can run [Docker](https://www.docker
 
 The main features provided by *clab*:
 
-- emulated network nodes based upon Linux namespaces (provided through [coreemu](https://github.com/coreemu/coreemu)
+- emulated network nodes based upon Linux namespaces (provided through [coreemu](https://github.com/coreemu/core)
 - support for ns2 movement traces
 - interactive [stop-motion movement](https://github.com/gh0st42/core-automator) helper
 - monitoring services
