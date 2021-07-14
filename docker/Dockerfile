@@ -17,7 +17,9 @@ RUN apt-get update \
     jq \
     tcpdump \
     gnuplot \
-    && apt-get clean
+    less \
+    netcat \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /root
 RUN git clone https://github.com/gh0st42/core-automator &&\
@@ -31,6 +33,13 @@ RUN pip install lorem-text
 WORKDIR /usr/local/bin
 COPY scripts/* /usr/local/bin/
 COPY analyzers/* /usr/local/bin/
+
+WORKDIR /root
+RUN mkdir -p /root/.coregui/icons/ && \
+    mkdir -p /root/.core
+COPY coreemu-addons/icons/uav*.png /root/.coregui/icons/
+COPY coreemu-addons/config.yaml /root/.coregui/
+COPY coreemu-addons/nodes.conf /root/.core/
 
 EXPOSE 22
 EXPOSE 50051
