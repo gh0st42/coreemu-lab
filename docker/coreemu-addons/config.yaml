@@ -29,10 +29,10 @@ observers: []
 preferences: !PreferencesConfig
   editor: vim
   gui3d: /usr/local/bin/std3d.sh
-  height: 750
+  height: 2000
   terminal: lxterminal -e
   theme: black
-  width: 1000
+  width: 2000
 recentfiles: []
 scale: 1.0
 servers: []
