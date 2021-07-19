@@ -19,6 +19,7 @@ RUN apt-get update \
     gnuplot \
     less \
     netcat \
+    tigervnc-viewer \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /root
