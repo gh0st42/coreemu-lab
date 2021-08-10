@@ -42,7 +42,7 @@ print_log INFO Result will be put into $RESULTS_DIR
 mkdir $RESULTS_DIR || panic Could not create results directory: $RESULTS_DIR
 
 if [ ! -f "$BASEDIR/$SCENARIO" ]; then
-    panic Scenario $FILE not found.	
+    panic Scenario $BASEDIR/$SCENARIO not found.	
 fi
 
 ##########################################################################
@@ -53,6 +53,11 @@ fi
 
 print_log INFO Starting $BASEDIR/$SCENARIO
 core-cli xml -f $BASEDIR/$SCENARIO -s
+
+if [ -f "$BASEDIR/$AUTOMATOR" ]; then
+    print_log INFO Setting initial core-automator positions from $BASEDIR/$AUTOMATOR
+    core-automator.py -f $BASEDIR/$AUTOMATOR -i -c 1
+fi
 
 if [ $GUI = 1 ]; then
     print_log INFO Attaching gui to session
@@ -141,6 +146,11 @@ fi
 #
 ##########################################################################
 
+if [ -f "$BASEDIR/$AUTOMATOR" ]; then
+    print_log INFO Running core-automator with $BASEDIR/$AUTOMATOR
+    core-automator.py -f $BASEDIR/$AUTOMATOR -l -c 1 2>&1 > $RESULTS_DIR/core-automator.log &
+fi
+
 START_TIME=$(date +%s)
 print_log INFO Experiment started: $START_TIME
 echo $START_TIME > $RESULTS_DIR/start.txt
@@ -167,6 +177,11 @@ fi
 STOP_TIME=$(date +%s)
 print_log INFO Experiment finished: $STOP_TIME
 echo $STOP_TIME > $RESULTS_DIR/stop.txt
+
+if [ -f "$BASEDIR/$AUTOMATOR" ]; then
+    print_log INFO Stopping core-automator
+    killall core-automator.py
+fi
 
 if [ -n "$SHUTDOWN_PROCS" ]; then
     print_log INFO Stopping user services: $SHUTDOWN_PROCS

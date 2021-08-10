@@ -53,23 +53,29 @@ total_contacts_per_node = {}
 
 contacts_log = open(base_dir + "/contacts.log", "r")
 for line in contacts_log.readlines():
-    [ts, contacts] = line.strip().split(" ")
-    ts = int(ts) - start_time
-    contacts = contacts.split(",")
-    for c in contacts:
-        if "-" in c:
-            [n1, n2] = c.split("-")
-            if n1 not in total_contacts_per_node:
-                total_contacts_per_node[n1] = 1
-            else:
-                total_contacts_per_node[n1] += 1
+    line = line.strip()
+    num_contacts = 0
+    ts = 0
+    if not " " in line:
+        ts = int(line) - start_time
+    else:
+        [ts_str, contacts] = line.split(" ")
+        ts = int(ts_str) - start_time
+        contacts = contacts.split(",")
+        for c in contacts:
+            if "-" in c:
+                [n1, n2] = c.split("-")
+                if n1 not in total_contacts_per_node:
+                    total_contacts_per_node[n1] = 1
+                else:
+                    total_contacts_per_node[n1] += 1
 
-            if n2 not in total_contacts_per_node:
-                total_contacts_per_node[n2] = 1
-            else:
-                total_contacts_per_node[n2] += 1
+                if n2 not in total_contacts_per_node:
+                    total_contacts_per_node[n2] = 1
+                else:
+                    total_contacts_per_node[n2] += 1
+        num_contacts = len(contacts)
 
-    num_contacts = len(contacts)
     total_contacts_per_ts.append([ts, num_contacts])
     max_contacts = max(max_contacts, num_contacts)
 
