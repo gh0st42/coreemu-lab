@@ -152,8 +152,14 @@ if [ -f "$BASEDIR/$AUTOMATOR" ]; then
 fi
 
 START_TIME=$(date +%s)
+cea "touch started.txt"
 print_log INFO Experiment started: $START_TIME
 echo $START_TIME > $RESULTS_DIR/start.txt
+
+if fn_exists start ; then
+    print_log INFO Found start hook, executing it now...
+    start $RESULTS_DIR
+fi
 
 ##########################################################################
 #
