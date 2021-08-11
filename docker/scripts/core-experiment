@@ -197,6 +197,12 @@ fi
 print_log INFO Stopping monitoring services 
 killall bwm-ng pidstat monitor-contacts monitor-xy 2>&1 > /dev/null
 
+##########################################################################
+#
+# COLLECT data
+#
+##########################################################################
+
 print_log INFO Collecting *.log from all nodes 
 
 if fn_exists post ; then
@@ -228,6 +234,12 @@ do
   print_log INFO Gathering file stats for node $NODE_NAME  
   find $i/ | cut -d "/" -f 4- > $RESULTS_DIR/$NODE_NAME/filelist.txt
 done
+
+##########################################################################
+#
+# ANALYZE results
+#
+##########################################################################
 
 if fn_exists analyze ; then
     print_log INFO Found analyze hook, executing it now...
@@ -261,17 +273,20 @@ if [ $MONITOR_XY = 1 ]; then
 fi
 
 print_log INFO Analyzing file stats
+
 for i in $RESULTS_DIR/*/filelist.txt
 do
   NODE_NAME=$(echo $i | cut -d "/" -f 4)    
   echo $NODE_NAME $(cat $i | wc -l) >> $RESULTS_DIR/filecount.csv  
 done
 
-for i in $RESULTS_DIR/*/nohup.periodic-file-generator.*.log
-do
-  NODE_NAME=$(echo $i | cut -d "/" -f 4)    
-  echo $NODE_NAME $(cat $i | wc -l) >> $RESULTS_DIR/periodic-files-generated.csv  
-done
+if [ $(find $RESULTS_DIR  | egrep 'nohup.periodic-file-generator.*.log' | wc -l ) -ne 0 ]; then
+    for i in $RESULTS_DIR/*/nohup.periodic-file-generator.*.log
+    do
+        NODE_NAME=$(echo $i | cut -d "/" -f 4)    
+        echo $NODE_NAME $(cat $i | wc -l) >> $RESULTS_DIR/periodic-files-generated.csv  
+    done
+fi
 
 print_log INFO Plotting contact data
 plot-contacts.py $RESULTS_DIR time

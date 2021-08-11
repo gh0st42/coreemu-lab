@@ -43,8 +43,8 @@ for f in logfiles:
     node_name = m.group(1)
     df = pd.read_csv(f, sep="\s+")
     stats = df.describe().T
-    the_row = stats[(stats.index == prop)]
-    the_row.rename(index={prop: node_name}, inplace=True)
+    raw_row = stats[(stats.index == prop)]
+    the_row = raw_row.rename(index={prop: node_name})
 
     per_node[node_name] = [the_row["mean"][0],
                            the_row["min"][0], the_row["max"][0]]
