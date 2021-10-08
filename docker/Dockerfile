@@ -19,6 +19,8 @@ RUN apt-get update \
     gnuplot \
     less \
     netcat \
+    unzip \
+    openjdk-8-jdk-headless \
     tigervnc-viewer \
     && rm -rf /var/lib/apt/lists/*
 
@@ -30,6 +32,13 @@ RUN git clone https://github.com/gh0st42/core-automator &&\
 
 # needed for periodic-file-generator
 RUN pip install lorem-text
+
+WORKDIR /root
+RUN wget https://sys.cs.uos.de/bonnmotion/src/bonnmotion-3.0.1.zip && \
+    unzip bonnmotion* && \
+    cd bonnmotion-3.0.1 && \
+    ./install && \
+    cp bin/bm /usr/local/bin
 
 WORKDIR /usr/local/bin
 COPY scripts/* /usr/local/bin/
