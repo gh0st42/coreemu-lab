@@ -5,6 +5,8 @@ service ssh start
 #service core-daemon start
 core-daemon > /var/log/core-daemon.log 2>&1 &
 
+iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+
 if [ ! -z "$SSHKEY" ]; then
 	echo "Adding ssh key: $SSHKEY"
 	mkdir /root/.ssh
