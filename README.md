@@ -152,6 +152,23 @@ Application:
   -ha <application name>        Print help to specific application
 ```
 
+### Acknowledging this work
+
+If you use this software in a scientific publication, please cite the following paper:
+
+```BibTeX
+@INPROCEEDINGS{Baum2110:Coreemu,
+AUTHOR={Lars {Baumg{\"a}rtner} and Tobias Meuser and Bastian Bloessl},
+TITLE="coreemu-lab: An Automated Network Emulation and Evaluation Environment",
+BOOKTITLE="2021 IEEE Global Humanitarian Technology Conference (GHTC) (GHTC 2021)",
+ADDRESS=virtual,
+DAYS=19,
+MONTH=oct,
+YEAR=2021,
+KEYWORDS="Network Simulation; Disruption-Tolerant Networking; Automated Evaluation"
+}
+```
+
 ## Contributing
 
 If you fix any bugs, have implemented other monitoring services or generate nice reports that might be helpful for others, please feel free to open a PR! 
