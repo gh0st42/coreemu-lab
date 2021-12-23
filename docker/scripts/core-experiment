@@ -288,9 +288,11 @@ if [ $(find $RESULTS_DIR  | egrep 'nohup.periodic-file-generator.*.log' | wc -l 
     done
 fi
 
-print_log INFO Plotting contact data
-plot-contacts.py $RESULTS_DIR time
-plot-contacts.py $RESULTS_DIR node
+if [ $MONITOR_CONTACTS = 1 ]; then
+    print_log INFO Plotting contact data
+    plot-contacts.py $RESULTS_DIR time
+    plot-contacts.py $RESULTS_DIR node
+fi
 
 ##########################################################################
 #

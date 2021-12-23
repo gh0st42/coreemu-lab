@@ -3,6 +3,8 @@
 systemctl enable ssh
 service ssh start
 #service core-daemon start
+/update-custom-serivces.sh
+
 core-daemon > /var/log/core-daemon.log 2>&1 &
 
 iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
