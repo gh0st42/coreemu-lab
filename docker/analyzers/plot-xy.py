@@ -49,10 +49,12 @@ xy_log = open(base_dir + "/xy.log", "r")
 for line in xy_log.readlines():
     if line.startswith("STEP") or len(line) < 7:
         continue
-    [node, x, y] = line.strip().split(",")
+    line = line.strip().replace("=", ",")
+    [node, x, y, z] = line.strip().split(",")
 
     x = float(x)
     y = float(y)
+    z = float(z)
     node = node.replace("\"", "")
     if not node in nodes_xy:
         nodes_xy[node] = []

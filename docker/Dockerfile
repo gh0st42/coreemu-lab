@@ -1,4 +1,11 @@
-FROM gh0st42/coreemu7:latest
+ARG ARCH=
+
+FROM ${ARCH}rust:1.58 as builder
+WORKDIR /root
+RUN rustup component add rustfmt
+RUN cargo install --bins --examples --root /usr/local --git https://github.com/gh0st42/coreemu-rs --branch coreemu8 --rev eda2ebd coreemu
+
+FROM ${ARCH}gh0st42/coreemu8:latest
 LABEL Description="Docker image for network evaluations using core network emulator"
 
 
@@ -23,6 +30,8 @@ RUN apt-get update \
     openjdk-8-jdk-headless \
     tigervnc-viewer \
     && rm -rf /var/lib/apt/lists/*
+
+COPY --from=builder /usr/local/bin/* /usr/local/bin/
 
 WORKDIR /root
 RUN git clone https://github.com/gh0st42/core-automator &&\

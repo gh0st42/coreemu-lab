@@ -14,7 +14,8 @@ do
     COUNTER=$((COUNTER+1))
 
     echo STEP $COUNTER $NOW 
-    core-cli -js query session -i 1 | jq -r '.session.nodes[] | select(.dir) | [.name, .position.x, .position.y ] | @csv'
+    #core-cli -js query session -i 1 | jq -r '.session.nodes[] | select(.dir) | [.name, .position.x, .position.y ] | @csv'
+    position_dump
     echo
     sleep $DELAY
 done

@@ -52,7 +52,7 @@ fi
 ##########################################################################
 
 print_log INFO Starting $BASEDIR/$SCENARIO
-core-cli xml -f $BASEDIR/$SCENARIO -s
+core-load-xml $BASEDIR/$SCENARIO -s
 
 if [ -f "$BASEDIR/$AUTOMATOR" ]; then
     print_log INFO Setting initial core-automator positions from $BASEDIR/$AUTOMATOR
