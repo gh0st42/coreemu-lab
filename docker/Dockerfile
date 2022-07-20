@@ -1,11 +1,13 @@
 ARG ARCH=
 
-FROM ${ARCH}rust:1.58 as builder
+FROM ${ARCH}rust:1.62.1 as builder
 WORKDIR /root
 RUN rustup component add rustfmt
-RUN cargo install --bins --examples --root /usr/local --git https://github.com/gh0st42/coreemu-rs --branch coreemu8 --rev eda2ebd coreemu
+RUN apt update && apt-get install build-essential cmake -y && rm -rf /var/lib/apt/lists/*
+#RUN cargo install --bins --examples --root /usr/local --git https://github.com/gh0st42/coreemu-rs --branch coreemu8 --rev eda2ebd coreemu
+RUN cargo install --bins --examples --root /usr/local --git https://github.com/gh0st42/coreemu-rs --rev 326a6f75 coreemu
 
-FROM ${ARCH}gh0st42/coreemu8:latest
+FROM ${ARCH}gh0st42/coreemu7:1.0.0
 LABEL Description="Docker image for network evaluations using core network emulator"
 
 
@@ -24,6 +26,7 @@ RUN apt-get update \
     jq \
     tcpdump \
     gnuplot \
+    lxterminal \
     less \
     netcat \
     unzip \
