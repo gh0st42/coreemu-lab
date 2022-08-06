@@ -3,7 +3,7 @@
 systemctl enable ssh
 service ssh start
 #service core-daemon start
-/update-custom-serivces.sh
+/update-custom-services.sh
 
 core-daemon > /var/log/core-daemon.log 2>&1 &
 
