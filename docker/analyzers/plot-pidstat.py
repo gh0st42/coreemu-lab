@@ -45,6 +45,13 @@ for f in logfiles:
     node_name = m.group(1)
     df = pd.read_csv(f, sep="\s+")
     stats = df.describe().T
+
+    # in case we're monitoring processes that aren't running on all nodes,
+    # some pidstat logs will simply be empty. In this case, pandas will not
+    # generate a "mean" statistic and we should skip further analysis
+    if "mean" not in stats:
+        continue
+
     raw_row = stats[(stats.index == prop)]
     the_row = raw_row.rename(index={prop: node_name})
 
