@@ -63,6 +63,7 @@ There is a scientific publication in progress that will showcase *clab* and we a
 ### Requirements
 
 - [Docker](https://www.docker.com/)
+- Linux kernel modules needed: *ebtables* and/or *sch_netem* 
 - Optionally: X11
 
 ### Installing *clab*
