@@ -27,12 +27,16 @@ fi
 
 BASEDIR=$(dirname $1)
 
+# set defaults for various parameters
 NAME=experiment
 MONITOR_PIDSTAT=0
 MONITOR_NET=0
+MONITOR_CONTACTS=0
+MONITOR_XY=0
 
 NOW=$(date +%s)
 
+# load settings from configuration file
 CONFIG=$1
 . $CONFIG
 
